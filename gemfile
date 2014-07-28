@@ -1,0 +1,8 @@
+source 'https://rubygems.org'
+
+gem 'rspec'
+gem 'cucumber'
+gem 'sinatra'
+gem 'capybara-sinatra'
+gem 'data_mapper'
+gem 'dm-postgres-adapter'
