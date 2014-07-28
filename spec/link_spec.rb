@@ -25,3 +25,4 @@ describe Link do
     end
 
   end
+end
