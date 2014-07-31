@@ -20,17 +20,65 @@ feature "User signs up" do
     expect(page).to have_content("This email is already taken")
   end
 
+end
 
-  def sign_up(email = "alice@example.com", 
-              password = "oranges!",
-              password_confirmation = "oranges!")
-    visit '/users/new'
-    expect(page.status_code).to eq(200)
-    expect(page.status_code).to eq(200)
-    fill_in :email, :with => email
-    fill_in :password, :with => password
-    fill_in :password_confirmation, :with => password_confirmation
-    click_button "Sign up"
+feature "User signs in" do
+
+  before(:each) do
+    User.create(:email => "test@test.com", 
+                :password => 'test', 
+                :password_confirmation => 'test')
+  end
+
+  scenario "with correct credentials" do
+    visit '/'
+    expect(page).not_to have_content("Welcome, test@test.com")
+    sign_in('test@test.com', 'test')
+    expect(page).to have_content("Welcome, test@test.com")
+  end
+
+  scenario "with incorrect credentials" do
+    visit '/'
+    expect(page).not_to have_content("Welcome, test@test.com")
+    sign_in('test@test.com', 'wrong')
+    expect(page).not_to have_content("Welcome, test@test.com")
   end
 
 end
+
+feature 'User signs out' do
+
+  before(:each) do
+    User.create(:email => "test@test.com", 
+                :password => 'test', 
+                :password_confirmation => 'test')
+  end
+
+  scenario 'while being signed in' do
+    sign_in('test@test.com', 'test')
+    click_button "Sign out"
+    expect(page).to have_content("Good bye!") # where does this message go?
+    expect(page).not_to have_content("Welcome, test@test.com")
+  end
+
+end
+
+feature 'User forgets password' do
+ 
+  before(:each) do
+    User.create(:email => "test@test.com", 
+                :password => 'test', 
+                :password_confirmation => 'test')
+  end
+  
+  scenario 'send forgotten pass email' do 
+    visit 'users/forgottenpassword'
+    fill_in 'Email', :with => "test@test.com"
+    click_button 'Reset'
+    expect(page).to have_content("We have sent a reset token to test@test.com") 
+    expect(User.first.password_token.length).to eq 64
+
+  end
+
+end  
+
